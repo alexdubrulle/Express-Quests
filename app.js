@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 
+app.put("/api/users/:id", userList.userUpdate);
 const app = express();
 app.use(express.json());
 const port = process.env.APP_PORT ?? 5000;
