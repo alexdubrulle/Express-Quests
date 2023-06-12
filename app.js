@@ -18,6 +18,7 @@ app.get("/api/movies", movieHandlers.getMovies);
 app.get("/api/movies/:id", movieHandlers.getMovieById);
 app.get("/api/users", userList.getUsers);
 app.get("/api/users/:id", userList.getUserById);
+app.delete("/api/users/:id", userList.deleteUser);
 
 app.listen(port, (err) => {
   if (err) {
