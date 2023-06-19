@@ -1,10 +1,26 @@
 const database = require("./database");
 
 const getUsers = (req, res) => {
+  let sql = "select * from users";
+  const sqlValues = [];
+
+  if (req.query.language != null) {
+    sql += " where language = ?";
+    sqlValues.push(req.query.language);
+
+    if (req.query.city != null) {
+      sql += "and city = ?";
+      sqlValues.push(req.query.city);
+    }
+  } else if (req.query.city != null) {
+    sql += " where city = ?";
+    sqlValues.push(req.query.city);
+  }
+
   database
-    .query("select * from users")
+    .query(sql, sqlValues)
     .then(([users]) => {
-      res.json(users);
+      res.status(200).json(users);
     })
     .catch((err) => {
       console.error(err);
@@ -19,7 +35,7 @@ const getUserById = (req, res) => {
     .query("select * from users where id = ?", [id])
     .then(([users]) => {
       if (users[0] != null) {
-        res.json(users[0]);
+        res.status(200).json(users[0]);
       } else {
         res.status(404).send("Not Found");
       }
@@ -35,7 +51,7 @@ const postUser = (req, res) => {
 
   database
     .query(
-      "INSERT INTO users(firstname, lastname, email, city, language) VALUES (?,?,?,?,?)",
+      "INSERT INTO users(firstname, lastname, email, city, language) VALUES (?, ?, ?, ?, ?)",
       [firstname, lastname, email, city, language]
     )
     .then(([result]) => {
@@ -43,16 +59,17 @@ const postUser = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      res.status(500).send("Error saving the user");
+      res.status(500).send("Error saving the movie");
     });
 };
-const userUpdate = (req, res) => {
+
+const updateUser = (req, res) => {
   const id = parseInt(req.params.id);
   const { firstname, lastname, email, city, language } = req.body;
 
   database
     .query(
-      "UPDATE users set firstname=?, lastname=?, email=?, city=?, language=? where id = ?",
+      "update users set firstname = ?, lastname = ?, email = ?, city = ?, language= ? where id = ?",
       [firstname, lastname, email, city, language, id]
     )
     .then(([result]) => {
@@ -64,7 +81,7 @@ const userUpdate = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      res.status(500).send("Error editing the user");
+      res.status(500).send("Error editing the movie");
     });
 };
 
@@ -72,7 +89,7 @@ const deleteUser = (req, res) => {
   const id = parseInt(req.params.id);
 
   database
-    .query("DELETE from users where id = ?", [id])
+    .query("delete from users where id = ?", [id])
     .then(([result]) => {
       if (result.affectedRows === 0) {
         res.status(404).send("Not Found");
@@ -90,6 +107,6 @@ module.exports = {
   getUsers,
   getUserById,
   postUser,
-  userUpdate,
+  updateUser,
   deleteUser,
 };
